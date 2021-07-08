@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">NetMapper</string>
+    <string name="cameraBtnDesc">Button to open camera activity</string>
+    <string name="tagImageDesc">Image to tag</string>
+    <string name="continueBtn">CONTINUE</string>
+</resources>
