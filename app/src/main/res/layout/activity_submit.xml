@@ -2,20 +2,75 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SubmitActivity">
+    tools:context=".activities.SubmitActivity">
 
     <ImageView
         android:id="@+id/submitImage"
         android:layout_width="match_parent"
-        android:layout_height="350dp"
+        android:layout_height="250dp"
         android:adjustViewBounds="true"
         android:contentDescription="@string/tagImageDesc"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.497" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/submitButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/submitImage">
+
+        <EditText
+            android:id="@+id/editTextType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:ems="10"
+            android:hint="@string/networkType"
+            android:backgroundTint="@color/purple_200"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/editTextDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:ems="10"
+            android:gravity="start|top"
+            android:hint="@string/descInfo"
+            android:backgroundTint="@color/purple_200"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/editTextComments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:gravity="start|top"
+            android:hint="@string/comments"
+            android:backgroundTint="@color/purple_200"
+            android:inputType="text"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/submitButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/submitBtn"
+        android:textColor="@color/white"
+        android:background="@color/purple_500"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

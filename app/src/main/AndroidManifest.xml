@@ -5,6 +5,8 @@
     <uses-feature android:name="android.hardware.camera" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:icon="@mipmap/ic_launcher"
@@ -23,9 +25,9 @@
                 android:resource="@xml/fileprovider"/>
         </provider>
 
-        <activity android:name=".SubmitActivity"/>
-        <activity android:name=".TagActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".activities.SubmitActivity"/>
+        <activity android:name=".activities.TagActivity" />
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

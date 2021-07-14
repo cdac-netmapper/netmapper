@@ -1,4 +1,4 @@
-package com.phamsonhoang.netmapper
+package com.phamsonhoang.netmapper.activities
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -11,6 +11,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import com.phamsonhoang.netmapper.R
 import java.io.File
 import java.io.FileOutputStream
 
@@ -78,7 +79,6 @@ class TagActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListe
             submitIntent.putExtra("imageFile", taggedPhotoFile)
             // Delete original temp photo file
             val result = originalPhotoFile.delete()
-            Log.d("ogPhotoFile.delete()", result.toString())
             startActivity(submitIntent)
         }
     }
@@ -91,19 +91,16 @@ class TagActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListe
 
         when (action) {
             MotionEvent.ACTION_DOWN -> {
-                Log.d("ACTION_DOWN", "detected")
                 mX = x
                 mY = y
                 drawOnProjectedBitMap(view as ImageView, bmp, mX, mY, x, y)
             }
             MotionEvent.ACTION_MOVE -> {
-                Log.d("ACTION_MOVE", "detected")
                 drawOnProjectedBitMap(view as ImageView, bmp, mX, mY, x, y)
                 mX = x
                 mY = y
             }
             MotionEvent.ACTION_UP -> {
-                Log.d("ACTION_UP", "detected")
                 drawOnProjectedBitMap(view as ImageView, bmp, mX, mY, x, y)
             }
         }
@@ -118,13 +115,10 @@ class TagActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListe
         iv: ImageView, bm: Bitmap,
         x0: Float, y0: Float, x: Float, y: Float
     ) {
-        Log.d("drawOnProjectedBitMap", "drawing...")
         if (x < 0 || y < 0 || x > iv.width || y > iv.height) {
             //outside ImageView
-            Log.d("drawOnProjectedBitMap", "outside of ImageView")
             return
         } else {
-            Log.d("drawOnProjectedBitMap", "drawing on canvas")
             val ratioWidth = bm.width.toFloat() / iv.width.toFloat()
             val ratioHeight = bm.height.toFloat() / iv.height.toFloat()
             canvas.drawLine(

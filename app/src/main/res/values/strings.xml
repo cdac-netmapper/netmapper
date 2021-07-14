@@ -3,4 +3,8 @@
     <string name="cameraBtnDesc">Button to open camera activity</string>
     <string name="tagImageDesc">Image to tag</string>
     <string name="continueBtn">CONTINUE</string>
+    <string name="submitBtn">SUBMIT</string>
+    <string name="networkType">Type of network infrastructure</string>
+    <string name="descInfo">Descriptive information</string>
+    <string name="comments">Comments</string>
 </resources>
