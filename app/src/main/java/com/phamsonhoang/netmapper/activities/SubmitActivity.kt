@@ -3,13 +3,13 @@ package com.phamsonhoang.netmapper.activities
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
-import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -19,16 +19,38 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.phamsonhoang.netmapper.R
+import com.phamsonhoang.netmapper.models.Submission
+import com.phamsonhoang.netmapper.models.UploadResponse
+import com.phamsonhoang.netmapper.network.ApiClient
+import com.phamsonhoang.netmapper.network.ImgurApiClient
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.Call
+import retrofit2.Response
+import retrofit2.Callback
 import java.io.File
+import java.text.DateFormat
+import java.util.*
 
 private const val LOCATION_REQUEST_CODE = 1
 private const val ACTIVITY = "SubmitActivity"
 private lateinit var submitImageFile: File
 private lateinit var locationCallback: LocationCallback
 class SubmitActivity : AppCompatActivity(), View.OnClickListener {
+    private val client by lazy { ApiClient.create() }
+    private val imgurApiClient by lazy { ImgurApiClient.create() }
+    val ctx = this
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_submit)
+
+        val typeEditText = findViewById<EditText>(R.id.editTextType)
+        val descEditText = findViewById<EditText>(R.id.editTextDesc)
+        val commentEditText = findViewById<EditText>(R.id.editTextComments)
 
         val submitImageView = findViewById<ImageView>(R.id.submitImage)
         submitImageFile = intent.extras?.get("imageFile") as File
@@ -43,7 +65,43 @@ class SubmitActivity : AppCompatActivity(), View.OnClickListener {
                 super.onLocationResult(result)
                 val location = result.lastLocation
                 Log.d(ACTIVITY, "Long: ${location.longitude}; Lat: ${location.latitude}")
-                Log.d(ACTIVITY, "deleted submit file: ${submitImageFile.delete()}")
+
+                val df = DateFormat.getTimeInstance()
+                df.timeZone = TimeZone.getTimeZone("gmt")
+
+                // Upload image to Imgur
+                val filePart = MultipartBody
+                    .Part
+                    .createFormData("image", submitImageFile.name, submitImageFile.asRequestBody())
+                imgurApiClient.uploadFile(filePart, name = submitImageFile.name.toRequestBody())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        Log.d(ACTIVITY, it.toString())
+                        val imageLink = it.upload.link
+                        val submission = Submission(
+                            type = typeEditText.text.toString(),
+                            desc = descEditText.text.toString(),
+                            comment = commentEditText.text.toString(),
+                            image = imageLink,
+                            long = location.longitude,
+                            lat = location.latitude,
+                            submittedAt = df.format(Date())
+                        )
+                        client.addSubmission(submission)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({
+                                Toast.makeText(ctx, "Successfully submitted data!", Toast.LENGTH_SHORT).show()
+                            }, {
+                                it.printStackTrace()
+                                Toast.makeText(ctx, it.message, Toast.LENGTH_LONG).show()
+                            })
+                        Log.d(ACTIVITY, "deleted submit file: ${submitImageFile.delete()}")
+                    }, {
+                        it.printStackTrace()
+                        Toast.makeText(ctx, "Error: unable to upload image!", Toast.LENGTH_LONG).show()
+                    })
             }
         }
     }
