@@ -12,20 +12,27 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import com.phamsonhoang.netmapper.R
+import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileOutputStream
 
+private const val ACTIVITY = "TagActivity"
 private const val TAGGED_FILENAME = "taggedPhoto.jpg"
 private lateinit var taggedPhotoFile: File
 private lateinit var originalPhotoFile: File
 class TagActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListener {
 
+    // Draw
     private lateinit var bmp: Bitmap
     private lateinit var canvas: Canvas
     private lateinit var paintDraw: Paint
     private var mX: Float = 0f
     private var mY: Float = 0f
 
+    // Context
+    private val ctx = this
+
+    // View components
     private lateinit var imageResultView: ImageView
 
     @SuppressLint("ClickableViewAccessibility")
@@ -70,16 +77,17 @@ class TagActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListe
                 bmp.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
                 outputStream.flush()
                 outputStream.close()
+                // Passing on file to SubmitActivity
+                val submitIntent = Intent(ctx, SubmitActivity::class.java)
+                submitIntent.putExtra("imageFile", taggedPhotoFile)
+                // Delete original temp photo file
+                val result = originalPhotoFile.delete()
+                Log.d(ACTIVITY, "Deleted temp photo file: $result")
+                startActivity(submitIntent)
             } catch (e: Exception) {
                 e.printStackTrace()
                 return
             }
-            // Passing on file to SubmitActivity
-            val submitIntent = Intent(this, SubmitActivity::class.java)
-            submitIntent.putExtra("imageFile", taggedPhotoFile)
-            // Delete original temp photo file
-            val result = originalPhotoFile.delete()
-            startActivity(submitIntent)
         }
     }
 

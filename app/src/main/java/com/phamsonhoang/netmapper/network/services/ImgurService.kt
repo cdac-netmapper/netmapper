@@ -5,7 +5,7 @@ import okhttp3.Interceptor
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Multipart
@@ -18,10 +18,10 @@ private const val IMGUR_CLIENT_ID = "c36a40d78cc19fc"
 interface ImgurService {
     @Multipart
     @POST("/3/upload")
-    fun uploadImage(
+    suspend fun uploadImage(
         @Part image: MultipartBody.Part?,
         @Part("name") name: RequestBody? = null
-    ): Call<ImageUploadResponse>
+    ): Response<ImageUploadResponse>
 
     companion object {
         var imgurService: ImgurService? = null
