@@ -1,8 +1,8 @@
-package com.phamsonhoang.netmapper.models
+package com.phamsonhoang.netmapper.models.responses
 
 import com.google.gson.annotations.SerializedName
 
-data class UploadResponse(
+data class ImageUploadResponse(
     @SerializedName("data")
     val upload: Upload,
     @SerializedName("status")
