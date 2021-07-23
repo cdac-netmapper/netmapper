@@ -28,23 +28,23 @@ interface ImgurService {
 
         fun getInstance(): ImgurService {
             if (imgurService == null) {
-                val interceptor = object : Interceptor {
-                    override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
-                        var request = chain.request()
-                        val headers = request
-                            .headers
-                            .newBuilder()
-                            .add("Client-ID", IMGUR_CLIENT_ID)
-                            .build()
-                        request = request.newBuilder().headers(headers).build()
-                        return chain.proceed(request)
-                    }
-                }
-                val client = OkHttpClient.Builder()
-                    .addInterceptor(interceptor)
-                    .build()
+                // val interceptor = object : Interceptor {
+                //     override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
+                //         var request = chain.request()
+                //         val headers = request
+                //             .headers
+                //             .newBuilder()
+                //             .add("Client-ID", IMGUR_CLIENT_ID)
+                //             .build()
+                //         request = request.newBuilder().headers(headers).build()
+                //         return chain.proceed(request)
+                //     }
+                // }
+                // val client = OkHttpClient.Builder()
+                //     .addInterceptor(interceptor)
+                //     .build()
                 val retrofit = Retrofit.Builder()
-                    .client(client)
+                    // .client(client)
                     .baseUrl(IMGUR_BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
