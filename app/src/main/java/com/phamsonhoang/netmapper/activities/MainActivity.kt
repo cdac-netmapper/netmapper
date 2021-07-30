@@ -14,45 +14,46 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayout
 import com.phamsonhoang.netmapper.R
+import com.phamsonhoang.netmapper.adapters.TabPageAdapter
 import java.io.File
 
-private const val FILENAME = "photo.jpg"
-private lateinit var photoFile: File
+
 class MainActivity : AppCompatActivity() {
+    private lateinit var tabLayout : TabLayout
+    private lateinit var viewPager : ViewPager2
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val startForResult = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult(),
-            ActivityResultCallback {
-            if (it?.resultCode == Activity.RESULT_OK) {
-                // Extract image data
-                val intent = Intent(this, TagActivity::class.java)
-                intent.putExtra("imageFile", photoFile)
-                startActivity(intent)
+        tabLayout = findViewById(R.id.tabLayout)
+        viewPager = findViewById(R.id.viewPager)
+
+        setUpTabBar()
+    }
+
+    private fun setUpTabBar() {
+        val adapter = TabPageAdapter(this, tabLayout.tabCount)
+        viewPager.adapter = adapter
+
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                tabLayout.selectTab(tabLayout.getTabAt(position))
             }
         })
 
-        val cameraBtn = findViewById<FloatingActionButton>(R.id.cameraButton)
-        cameraBtn.setOnClickListener {
-            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            photoFile = getPhotoFile()
-            val fileProvider = FileProvider.getUriForFile(this, "com.phamsonhoang.fileprovider", photoFile)
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider)
-            try {
-                Log.d("intent.resolveActivity", "starting camera activity...")
-                startForResult.launch(intent)
-            } catch (e: ActivityNotFoundException) {
-                Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener
+        {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                viewPager.currentItem = tab.position
             }
-        }
-    }
 
-    private fun getPhotoFile(): File {
-        // Use 'getExternalFilesDir' on Context to access package-specific directories.
-        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(FILENAME, ".jpg", storageDir)
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
     }
 }

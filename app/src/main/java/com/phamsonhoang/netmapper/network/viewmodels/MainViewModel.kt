@@ -3,6 +3,7 @@ package com.phamsonhoang.netmapper.network.viewmodels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.phamsonhoang.netmapper.models.Submission
+import com.phamsonhoang.netmapper.models.responses.ExamplesListResponse
 import com.phamsonhoang.netmapper.models.responses.SubmissionResponse
 import com.phamsonhoang.netmapper.network.repositories.MainRepository
 import kotlinx.coroutines.*
@@ -12,6 +13,7 @@ import retrofit2.Response
 
 class MainViewModel constructor(private val repository: MainRepository) : ViewModel() {
     val submissionResponse = MutableLiveData<SubmissionResponse>()
+    val examplesListResponse = MutableLiveData<ExamplesListResponse>()
     val errorMessage = MutableLiveData<String>()
     val loading = MutableLiveData<Boolean>()
 
@@ -29,7 +31,22 @@ class MainViewModel constructor(private val repository: MainRepository) : ViewMo
                     submissionResponse.postValue(resp.body())
                     loading.postValue(false)
                 } else {
-                    onError("Error: ${resp.message()}")
+                    onError("Error: ${resp.errorBody()}")
+                }
+            }
+        }
+    }
+
+    fun getExamples() {
+        loading.postValue(true)
+        job = CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
+            val resp = repository.getExamples()
+            withContext(Dispatchers.Main) {
+                if (resp.isSuccessful) {
+                    examplesListResponse.postValue(resp.body())
+                    loading.postValue(false)
+                } else {
+                    onError("Error: ${resp.errorBody()}")
                 }
             }
         }

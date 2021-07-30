@@ -8,6 +8,7 @@ import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
@@ -17,7 +18,8 @@ private const val IMGUR_CLIENT_ID = "c36a40d78cc19fc"
 
 interface ImgurService {
     @Multipart
-    @POST("/3/upload")
+    @Headers("Authorization: Client-ID $IMGUR_CLIENT_ID")
+    @POST("3/upload")
     suspend fun uploadImage(
         @Part image: MultipartBody.Part?,
         @Part("name") name: RequestBody? = null
@@ -28,23 +30,7 @@ interface ImgurService {
 
         fun getInstance(): ImgurService {
             if (imgurService == null) {
-                // val interceptor = object : Interceptor {
-                //     override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
-                //         var request = chain.request()
-                //         val headers = request
-                //             .headers
-                //             .newBuilder()
-                //             .add("Client-ID", IMGUR_CLIENT_ID)
-                //             .build()
-                //         request = request.newBuilder().headers(headers).build()
-                //         return chain.proceed(request)
-                //     }
-                // }
-                // val client = OkHttpClient.Builder()
-                //     .addInterceptor(interceptor)
-                //     .build()
                 val retrofit = Retrofit.Builder()
-                    // .client(client)
                     .baseUrl(IMGUR_BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()

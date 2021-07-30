@@ -1,7 +1,10 @@
 package com.phamsonhoang.netmapper.models
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class Submission(
     @SerializedName("type")
     val type: String,
@@ -17,4 +20,4 @@ data class Submission(
     val lat: Double,
     @SerializedName("submittedAt")
     val submittedAt: String
-)
+) : Parcelable

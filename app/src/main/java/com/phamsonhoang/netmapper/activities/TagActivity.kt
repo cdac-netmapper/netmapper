@@ -11,6 +11,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import com.bumptech.glide.Glide
 import com.phamsonhoang.netmapper.R
 import kotlinx.coroutines.*
 import java.io.File
@@ -18,9 +19,9 @@ import java.io.FileOutputStream
 
 private const val ACTIVITY = "TagActivity"
 private const val TAGGED_FILENAME = "taggedPhoto.jpg"
-private lateinit var taggedPhotoFile: File
-private lateinit var originalPhotoFile: File
 class TagActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListener {
+    private lateinit var taggedPhotoFile: File
+    private lateinit var originalPhotoFile: File
 
     // Draw
     private lateinit var bmp: Bitmap

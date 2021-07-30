@@ -1,6 +1,7 @@
 package com.phamsonhoang.netmapper.activities
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.location.Location
@@ -9,17 +10,16 @@ import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.Toast
+import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.material.textfield.TextInputLayout
 import com.phamsonhoang.netmapper.R
 import com.phamsonhoang.netmapper.models.Submission
 import com.phamsonhoang.netmapper.network.repositories.ImgurRepository
@@ -37,10 +37,10 @@ import java.text.DateFormat
 import java.util.*
 
 private const val LOCATION_REQUEST_CODE = 1
-private const val ACTIVITY = "SubmitActivity"
-private lateinit var submitImageFile: File
-private lateinit var locationCallback: LocationCallback
+private const val TAG = "SubmitActivity"
 class SubmitActivity : AppCompatActivity(), View.OnClickListener {
+    private lateinit var submitImageFile: File
+    private lateinit var locationCallback: LocationCallback
     // NetMapper API
     private lateinit var mainViewModel: MainViewModel
     private val apiService = ApiService.getInstance()
@@ -50,9 +50,9 @@ class SubmitActivity : AppCompatActivity(), View.OnClickListener {
     // Context
     private val ctx = this
     // View components
-    private lateinit var typeEditText: EditText
-    private lateinit var descEditText: EditText
-    private lateinit var commentEditText: EditText
+    private lateinit var typeEditText: TextInputLayout
+    private lateinit var descEditText: TextInputLayout
+    private lateinit var commentEditText: TextInputLayout
     private lateinit var submitImageView: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,7 +66,7 @@ class SubmitActivity : AppCompatActivity(), View.OnClickListener {
         submitImageView = findViewById(R.id.submitImage)
         submitImageFile = intent.extras?.get("imageFile") as File
         val submitImage = BitmapFactory.decodeFile(submitImageFile.absolutePath)
-        submitImageView.setImageBitmap(submitImage)
+        Glide.with(this).load(submitImage).into(submitImageView)
 
         val submitButton = findViewById<Button>(R.id.submitButton)
         submitButton.setOnClickListener(this)
@@ -76,11 +76,28 @@ class SubmitActivity : AppCompatActivity(), View.OnClickListener {
         imgurViewModel = ViewModelProvider(this, ImgurViewModelFactory(ImgurRepository(imgurService)))
             .get(ImgurViewModel::class.java)
 
+        /* Get options for dropdown */
+        with(mainViewModel) {
+            examplesListResponse.observe(ctx, {
+                Log.d(TAG, it.toString())
+                val options = it.examples.map { it.type }
+                val arrayAdapter = ArrayAdapter(ctx, R.layout.list_types_item, options)
+                (typeEditText.editText as AutoCompleteTextView).setAdapter(arrayAdapter)
+            })
+
+            errorMessage.observe(ctx, {
+                Log.d(TAG, it.toString())
+                Toast.makeText(ctx,"Error: unable to fetch options...", Toast.LENGTH_LONG).show()
+            })
+            getExamples()
+        }
+
+        /* Get current location callback */
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 super.onLocationResult(result)
                 val location = result.lastLocation
-                Log.d(ACTIVITY, "Long: ${location.longitude}; Lat: ${location.latitude}")
+                Log.d(TAG, "Long: ${location.longitude}; Lat: ${location.latitude}")
                 // Upload image to Imgur & post submission
                 uploadImage(location)
             }
@@ -93,12 +110,12 @@ class SubmitActivity : AppCompatActivity(), View.OnClickListener {
             .createFormData("image", submitImageFile.name, submitImageFile.asRequestBody())
         with(imgurViewModel) {
             imageUploadResponse.observe(ctx, {
-                Log.d(ACTIVITY, it.toString())
+                Log.d(TAG, it.toString())
                 // Post submission to server
                 postSubmission(it.upload.link, location)
             })
             errorMessage.observe(ctx, {
-                Log.d(ACTIVITY, it.toString())
+                Log.d(TAG, it.toString())
                 Toast.makeText(ctx, "Error: unable to upload image!", Toast.LENGTH_LONG).show()
             })
             uploadImage(filePart)
@@ -111,9 +128,9 @@ class SubmitActivity : AppCompatActivity(), View.OnClickListener {
         df.timeZone = TimeZone.getTimeZone("gmt")
 
         val submission = Submission(
-            type = typeEditText.text.toString(),
-            desc = descEditText.text.toString(),
-            comment = commentEditText.text.toString(),
+            type = typeEditText.editText?.text.toString(),
+            desc = descEditText.editText?.text.toString(),
+            comment = commentEditText.editText?.text.toString(),
             image = imageLink,
             long = location.longitude,
             lat = location.latitude,
@@ -121,12 +138,16 @@ class SubmitActivity : AppCompatActivity(), View.OnClickListener {
         )
         with(mainViewModel) {
             submissionResponse.observe(ctx, {
-                Log.d(ACTIVITY, it.toString())
-                Toast.makeText(ctx, "Successfully submitted data!", Toast.LENGTH_SHORT).show()
-                Log.d(ACTIVITY, "deleted submit file: ${submitImageFile.delete()}")
+                Log.d(TAG, it.toString())
+                Log.d(TAG, "deleted submit file: ${submitImageFile.delete()}")
+                intent = Intent(ctx, SubmissionDetailActivity::class.java)
+                intent.putExtra("message", "Successfully submitted data!")
+                intent.putExtra("submission", submission)
+                startActivity(intent)
+                ctx.finish()
             })
             errorMessage.observe(ctx, {
-                Log.d(ACTIVITY, it.toString())
+                Log.d(TAG, it.toString())
                 Toast.makeText(ctx, "Failed to submit data!", Toast.LENGTH_SHORT).show()
             })
             postSubmission(submission)
@@ -134,7 +155,7 @@ class SubmitActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun getLocationForSubmission() {
-        Log.d(ACTIVITY, "Submitting...")
+        Log.d(TAG, "Submitting...")
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -143,7 +164,7 @@ class SubmitActivity : AppCompatActivity(), View.OnClickListener {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            Log.d(ACTIVITY, "submit(): location permission denied")
+            Log.d(TAG, "submit(): location permission denied")
             return
         }
         val locationRequest = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
