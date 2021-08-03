@@ -11,9 +11,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
-import com.bumptech.glide.Glide
 import com.phamsonhoang.netmapper.R
-import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileOutputStream
 
@@ -59,7 +57,7 @@ class TagActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListe
         canvas = Canvas(bmp)
         canvas.drawBitmap(tempBitmap, 0f, 0f, null)
 
-        imageResultView = findViewById<ImageView>(R.id.imageView)
+        imageResultView = findViewById(R.id.imageView)
         imageResultView.setImageBitmap(bmp)
         imageResultView.setOnTouchListener(this)
 

@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/container"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/exampleThumbnail"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:contentDescription="@string/exampleImg"/>
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:background="@color/grey"
+        android:contentDescription="@string/shimmerPlaceholderImg"
+        />
 
 </RelativeLayout>

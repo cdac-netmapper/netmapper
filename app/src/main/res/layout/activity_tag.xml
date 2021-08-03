@@ -8,9 +8,9 @@
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_above="@+id/continueButton"
-        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
         android:contentDescription="@string/tagImageDesc"
         />
 
@@ -20,6 +20,7 @@
         android:layout_height="wrap_content"
         android:text="@string/continueBtn"
         android:textColor="@color/white"
+        android:textAlignment="center"
         android:background="?colorPrimary"
         android:layout_alignParentBottom="true"/>
 

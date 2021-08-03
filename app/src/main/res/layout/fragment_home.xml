@@ -14,6 +14,6 @@
         android:focusable="true"
         android:layout_gravity="center_horizontal|bottom"
         android:layout_marginBottom="50dp"
-        android:src="@android:drawable/ic_menu_camera"/>
+        android:src="@drawable/baseline_add_a_photo_white_24"/>
 
 </FrameLayout>

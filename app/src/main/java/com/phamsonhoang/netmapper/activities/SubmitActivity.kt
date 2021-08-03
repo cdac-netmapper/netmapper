@@ -21,6 +21,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.textfield.TextInputLayout
 import com.phamsonhoang.netmapper.R
+import com.phamsonhoang.netmapper.adapters.OptionsAdapter
 import com.phamsonhoang.netmapper.models.Submission
 import com.phamsonhoang.netmapper.network.repositories.ImgurRepository
 import com.phamsonhoang.netmapper.network.repositories.MainRepository
@@ -80,9 +81,9 @@ class SubmitActivity : AppCompatActivity(), View.OnClickListener {
         with(mainViewModel) {
             examplesListResponse.observe(ctx, {
                 Log.d(TAG, it.toString())
-                val options = it.examples.map { it.type }
-                val arrayAdapter = ArrayAdapter(ctx, R.layout.list_types_item, options)
-                (typeEditText.editText as AutoCompleteTextView).setAdapter(arrayAdapter)
+                val options = it.examples.sortedBy { it.type }
+                val optionsAdapter = OptionsAdapter(ctx, R.layout.list_types_item, options)
+                (typeEditText.editText as AutoCompleteTextView).setAdapter(optionsAdapter)
             })
 
             errorMessage.observe(ctx, {

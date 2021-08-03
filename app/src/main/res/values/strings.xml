@@ -2,6 +2,8 @@
     <string name="app_name">NetMapper</string>
     <string name="cameraBtnDesc">Button to open camera activity</string>
     <string name="tagImageDesc">Image to tag</string>
+    <string name="shimmerPlaceholderImg">Shimmer placeholder for example image</string>
+    <string name="exampleImg">Example image</string>
     <string name="submissionImageDesc">Submission image</string>
     <string name="continueBtn">CONTINUE</string>
     <string name="submitBtn">SUBMIT</string>
@@ -12,4 +14,5 @@
     <string name="examples">Examples</string>
     <string name="examples_intro">NetMapper allows you to submit images of different network infrastructure markers. Here are some information about these markers to help you better identify them in the wild!</string>
     <string name="loading">Loading…</string>
+    <string name="learnMoreBtn">LEARN MORE</string>
 </resources>

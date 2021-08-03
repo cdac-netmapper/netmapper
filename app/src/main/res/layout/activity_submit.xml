@@ -9,11 +9,12 @@
 
     <ImageView
         android:id="@+id/submitImage"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
         android:layout_alignParentTop="true"
         android:layout_above="@+id/formLayout"
-        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
         android:contentDescription="@string/tagImageDesc"
        />
 
@@ -72,6 +73,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/submitBtn"
+        android:textAlignment="center"
         android:textColor="@color/white"
         android:background="@color/purple_500"
         android:layout_alignParentBottom="true"/>

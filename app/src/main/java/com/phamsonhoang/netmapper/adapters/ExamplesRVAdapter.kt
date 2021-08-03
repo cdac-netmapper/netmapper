@@ -12,7 +12,7 @@ import com.phamsonhoang.netmapper.R
 import com.phamsonhoang.netmapper.activities.ExampleDetailActivity
 import com.phamsonhoang.netmapper.models.Example
 
-class ExamplesRVAdapter(private val data : List<Example>, private val ctx : Context) :
+class ExamplesRVAdapter(private val data : ArrayList<Example>, private val ctx : Context) :
     RecyclerView.Adapter<ExamplesRVAdapter.ViewHolder>() {
     class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
         val imageView : ImageView = itemView.findViewById(R.id.exampleThumbnail)
@@ -39,5 +39,9 @@ class ExamplesRVAdapter(private val data : List<Example>, private val ctx : Cont
 
     override fun getItemCount(): Int {
         return data.size
+    }
+
+    fun addData(newData : List<Example>) {
+        data.addAll(newData)
     }
 }

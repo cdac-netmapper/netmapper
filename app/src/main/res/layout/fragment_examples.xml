@@ -1,26 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
     tools:context=".fragments.ExamplesFragment">
 
-    <com.google.android.material.textview.MaterialTextView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:layout_marginTop="5dp"
-        android:textSize="14sp"
-        android:textColor="@color/black"
-        android:text="@string/examples_intro"/>
+        android:layout_height="wrap_content">
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/aboutExamplesTxtView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:textSize="14sp"
+            android:textColor="@color/black"
+            android:text="@string/examples_intro"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/aboutExamplesTxtView"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/exampleInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:paddingTop="10dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:hint="@string/networkType"
+                android:layout_weight="35"
+                android:layout_marginBottom="10dp">
+
+                <AutoCompleteTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/learnMoreBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="65"
+                android:background="?colorPrimary"
+                android:text="@string/learnMoreBtn"
+                android:textAlignment="center"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+    </RelativeLayout>
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/examplesShimmerLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="250dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="5dp">
+
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:useDefaultMargins="true"
+            android:columnCount="2"
+            android:rowCount="3">
+
+            <include layout="@layout/shimmer_example_placeholder" />
+
+            <include layout="@layout/shimmer_example_placeholder" />
+
+            <include layout="@layout/shimmer_example_placeholder" />
+
+            <include layout="@layout/shimmer_example_placeholder" />
+
+            <include layout="@layout/shimmer_example_placeholder" />
+
+            <include layout="@layout/shimmer_example_placeholder" />
+        </GridLayout>
+    </com.facebook.shimmer.ShimmerFrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/examplesRecyclerView"
-        android:layout_width="match_parent"
+        android:scrollbars="vertical"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
         android:layout_height="250dp"
         android:layout_marginBottom="5dp"
-        android:layout_gravity="bottom|center_horizontal"
-        android:textAlignment="center"/>
-
+        android:layout_gravity="bottom|center_horizontal"/>
 </FrameLayout>
