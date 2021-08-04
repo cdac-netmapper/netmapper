@@ -10,7 +10,7 @@ import com.phamsonhoang.netmapper.R
 import com.phamsonhoang.netmapper.models.Example
 
 private const val TAG = "ExampleDetailActivity"
-class ExampleDetailActivity : AppCompatActivity() {
+class ExampleDetailActivity : BaseActivity() {
     private lateinit var example : Example
     // Views
     private lateinit var descTxtView : TextView

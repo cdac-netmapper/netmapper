@@ -7,6 +7,7 @@
     <string name="submissionImageDesc">Submission image</string>
     <string name="continueBtn">CONTINUE</string>
     <string name="submitBtn">SUBMIT</string>
+    <string name="submittingBtn">SUBMITTING…</string>
     <string name="networkType">Type of network infrastructure</string>
     <string name="descInfo">Descriptive information</string>
     <string name="comments">Comments</string>
@@ -15,4 +16,6 @@
     <string name="examples_intro">NetMapper allows you to submit images of different network infrastructure markers. Here are some information about these markers to help you better identify them in the wild!</string>
     <string name="loading">Loading…</string>
     <string name="learnMoreBtn">LEARN MORE</string>
+    <string name="cancel">Cancel</string>
+    <string name="undo">Undo</string>
 </resources>

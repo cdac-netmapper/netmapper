@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.os.Environment
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
@@ -14,14 +16,16 @@ import android.widget.ImageView
 import com.phamsonhoang.netmapper.R
 import java.io.File
 import java.io.FileOutputStream
+import java.util.*
 
 private const val ACTIVITY = "TagActivity"
 private const val TAGGED_FILENAME = "taggedPhoto.jpg"
-class TagActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListener {
+class TagActivity : BaseActivity(), View.OnClickListener, View.OnTouchListener {
     private lateinit var taggedPhotoFile: File
     private lateinit var originalPhotoFile: File
 
     // Draw
+    private var prevBmpList = Stack<Bitmap>()
     private lateinit var bmp: Bitmap
     private lateinit var canvas: Canvas
     private lateinit var paintDraw: Paint
@@ -33,6 +37,31 @@ class TagActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListe
 
     // View components
     private lateinit var imageResultView: ImageView
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.tag_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_undo -> {
+                if (prevBmpList.size > 0) {
+                    val undoBmp = prevBmpList.pop()
+                    canvas.drawBitmap(undoBmp!!, 0f, 0f, null)
+                    imageResultView.invalidate()
+                }
+                true
+            }
+            R.id.action_cancel -> {
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finishAffinity()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,8 +109,7 @@ class TagActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListe
                 val submitIntent = Intent(ctx, SubmitActivity::class.java)
                 submitIntent.putExtra("imageFile", taggedPhotoFile)
                 // Delete original temp photo file
-                val result = originalPhotoFile.delete()
-                Log.d(ACTIVITY, "Deleted temp photo file: $result")
+                deleteTempFile()
                 startActivity(submitIntent)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -98,6 +126,8 @@ class TagActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListe
 
         when (action) {
             MotionEvent.ACTION_DOWN -> {
+                val savedBmp = bmp.copy(bmp.config, true)
+                prevBmpList.push(savedBmp)
                 mX = x
                 mY = y
                 drawOnProjectedBitMap(view as ImageView, bmp, mX, mY, x, y)
@@ -137,5 +167,14 @@ class TagActivity : AppCompatActivity(), View.OnClickListener, View.OnTouchListe
             )
             imageResultView.invalidate()
         }
+    }
+
+    override fun onStop() {
+        deleteTempFile()
+        super.onStop()
+    }
+
+    private fun deleteTempFile() {
+        Log.d(ACTIVITY, "Deleted temp og photo file: ${originalPhotoFile.delete()}")
     }
 }

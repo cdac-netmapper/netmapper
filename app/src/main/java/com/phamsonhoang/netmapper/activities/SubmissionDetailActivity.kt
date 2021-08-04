@@ -1,5 +1,6 @@
 package com.phamsonhoang.netmapper.activities
 
+import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,7 +11,7 @@ import com.bumptech.glide.Glide
 import com.phamsonhoang.netmapper.R
 import com.phamsonhoang.netmapper.models.Submission
 
-class SubmissionDetailActivity : AppCompatActivity() {
+class SubmissionDetailActivity : BaseActivity() {
     private lateinit var submissionIView: ImageView
     private lateinit var locationTxtView: TextView
     private lateinit var typeTxtView: TextView
@@ -43,5 +44,11 @@ class SubmissionDetailActivity : AppCompatActivity() {
         descInfoTxtView.setText(submission?.desc)
         commentTxtView.setText(submission?.comment)
         submitDateTxtView.setText("Submitted on ${submission?.submittedAt}")
+    }
+
+    override fun onBackPressed() {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        super.onBackPressed()
     }
 }

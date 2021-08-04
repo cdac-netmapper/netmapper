@@ -5,12 +5,16 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.location.Location
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -39,7 +43,7 @@ import java.util.*
 
 private const val LOCATION_REQUEST_CODE = 1
 private const val TAG = "SubmitActivity"
-class SubmitActivity : AppCompatActivity(), View.OnClickListener {
+class SubmitActivity : BaseActivity(), View.OnClickListener {
     private lateinit var submitImageFile: File
     private lateinit var locationCallback: LocationCallback
     // NetMapper API
@@ -55,6 +59,24 @@ class SubmitActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var descEditText: TextInputLayout
     private lateinit var commentEditText: TextInputLayout
     private lateinit var submitImageView: ImageView
+    private lateinit var submitButton : Button
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.submit_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_cancel -> {
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finishAffinity()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +91,7 @@ class SubmitActivity : AppCompatActivity(), View.OnClickListener {
         val submitImage = BitmapFactory.decodeFile(submitImageFile.absolutePath)
         Glide.with(this).load(submitImage).into(submitImageView)
 
-        val submitButton = findViewById<Button>(R.id.submitButton)
+        submitButton = findViewById(R.id.submitButton)
         submitButton.setOnClickListener(this)
 
         mainViewModel = ViewModelProvider(this, MainViewModelFactory(MainRepository(apiService)))
@@ -103,6 +125,11 @@ class SubmitActivity : AppCompatActivity(), View.OnClickListener {
                 uploadImage(location)
             }
         }
+    }
+
+    override fun onStop() {
+        deleteTempFile()
+        super.onStop()
     }
 
     private fun uploadImage(location: Location) {
@@ -140,23 +167,24 @@ class SubmitActivity : AppCompatActivity(), View.OnClickListener {
         with(mainViewModel) {
             submissionResponse.observe(ctx, {
                 Log.d(TAG, it.toString())
-                Log.d(TAG, "deleted submit file: ${submitImageFile.delete()}")
+                deleteTempFile()
                 intent = Intent(ctx, SubmissionDetailActivity::class.java)
                 intent.putExtra("message", "Successfully submitted data!")
                 intent.putExtra("submission", submission)
                 startActivity(intent)
-                ctx.finish()
+                ctx.finishAffinity()
             })
             errorMessage.observe(ctx, {
                 Log.d(TAG, it.toString())
                 Toast.makeText(ctx, "Failed to submit data!", Toast.LENGTH_SHORT).show()
+                // Re-enable button
+                enableSubmitButton()
             })
             postSubmission(submission)
         }
     }
 
     private fun getLocationForSubmission() {
-        Log.d(TAG, "Submitting...")
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -177,7 +205,11 @@ class SubmitActivity : AppCompatActivity(), View.OnClickListener {
         )
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onClick(v: View?) {
+        // Disable and upadte submit button
+        disableSubmitButton()
+        // Fetch user's current location
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
         != PackageManager.PERMISSION_GRANTED) {
             // Request location permission
@@ -207,9 +239,30 @@ class SubmitActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 } else {
                     Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show()
+                    enableSubmitButton()
                 }
                 return
             }
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun disableSubmitButton() {
+        submitButton.isEnabled = false
+        submitButton.isClickable = false
+        submitButton.background = resources.getDrawable(R.color.purple_200, theme)
+        submitButton.text = resources.getString(R.string.submittingBtn)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun enableSubmitButton() {
+        submitButton.isEnabled = true
+        submitButton.isClickable = true
+        submitButton.background = resources.getDrawable(R.color.purple_500, theme)
+        submitButton.text = resources.getString(R.string.submitBtn)
+    }
+
+    private fun deleteTempFile() {
+        Log.d(TAG, "deleted submit file: ${submitImageFile.delete()}")
     }
 }
