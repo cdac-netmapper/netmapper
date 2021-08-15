@@ -2,10 +2,12 @@ package com.phamsonhoang.netmapper.adapters
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.phamsonhoang.netmapper.R
@@ -26,9 +28,13 @@ class ExamplesRVAdapter(private val data : ArrayList<Example>, private val ctx :
         return ViewHolder(view)
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val image = data[position].image
-        Glide.with(ctx).load(image).centerCrop().into(holder.imageView)
+        Glide.with(ctx)
+            .load(image)
+            .centerCrop()
+            .into(holder.imageView)
         holder.view.setOnClickListener {
             // Navigate to ExampleDetailActivity
             val intent = Intent(ctx, ExampleDetailActivity::class.java)

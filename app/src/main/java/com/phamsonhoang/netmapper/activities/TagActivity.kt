@@ -2,10 +2,11 @@ package com.phamsonhoang.netmapper.activities
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.*
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -13,15 +14,16 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Toast
+import androidx.core.content.res.ResourcesCompat
 import com.phamsonhoang.netmapper.R
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
 
-private const val ACTIVITY = "TagActivity"
+private const val TAG = "TagActivity"
 private const val TAGGED_FILENAME = "taggedPhoto.jpg"
 class TagActivity : BaseActivity(), View.OnClickListener, View.OnTouchListener {
-    private lateinit var taggedPhotoFile: File
     private lateinit var originalPhotoFile: File
 
     // Draw
@@ -37,6 +39,7 @@ class TagActivity : BaseActivity(), View.OnClickListener, View.OnTouchListener {
 
     // View components
     private lateinit var imageResultView: ImageView
+    private lateinit var continueBtn : Button
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.tag_menu, menu)
@@ -71,7 +74,7 @@ class TagActivity : BaseActivity(), View.OnClickListener, View.OnTouchListener {
         paintDraw = Paint()
         paintDraw.style = Paint.Style.STROKE
         paintDraw.color = Color.RED
-        paintDraw.strokeWidth = 2f
+        paintDraw.strokeWidth = 5f
 
         // Retrieve captured image as temp file
         originalPhotoFile = intent.extras?.get("imageFile") as File
@@ -90,17 +93,29 @@ class TagActivity : BaseActivity(), View.OnClickListener, View.OnTouchListener {
         imageResultView.setImageBitmap(bmp)
         imageResultView.setOnTouchListener(this)
 
-        val continueBtn = findViewById<Button>(R.id.continueButton)
-        continueBtn.setOnClickListener(this)
+        continueBtn = findViewById(R.id.continueButton)
+        if (checkExternalStorageAvailableForRW()) {
+            continueBtn.setOnClickListener(this)
+        } else {
+            Toast.makeText(this, "External storage not available to NetMapper!", Toast.LENGTH_SHORT).show()
+            continueBtn.isClickable = false
+            continueBtn.isEnabled = false
+            continueBtn.background = ResourcesCompat.getDrawable(resources, R.color.purple_200, theme)
+        }
+    }
+
+    private fun checkExternalStorageAvailableForRW() : Boolean {
+        val isAvailable = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)
+        Log.d(TAG, "External storage isAvailable: $isAvailable")
+        return isAvailable
     }
 
     override fun onClick(v: View?) {
         if(v?.id == R.id.continueButton) {
-            // Use 'getExternalFilesDir' on Context to access package-specific directories.
-            val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-            taggedPhotoFile = File.createTempFile(TAGGED_FILENAME, ".jpg", storageDir)
-            // Save tagged image to temp file
             try {
+                // Use 'getExternalFilesDir' on Context to access package-specific directories.
+                val taggedPhotoFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAGGED_FILENAME)
+                // Save tagged image to temp file
                 val outputStream = FileOutputStream(taggedPhotoFile)
                 bmp.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
                 outputStream.flush()
@@ -175,6 +190,8 @@ class TagActivity : BaseActivity(), View.OnClickListener, View.OnTouchListener {
     }
 
     private fun deleteTempFile() {
-        Log.d(ACTIVITY, "Deleted temp og photo file: ${originalPhotoFile.delete()}")
+        Log.d(TAG, "Deleted temp og photo file: ${originalPhotoFile.delete()}")
     }
+
+
 }

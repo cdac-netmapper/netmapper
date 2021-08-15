@@ -5,8 +5,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.location.Location
-import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
@@ -14,9 +12,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.google.android.gms.location.LocationCallback
@@ -103,7 +101,7 @@ class SubmitActivity : BaseActivity(), View.OnClickListener {
         with(mainViewModel) {
             examplesListResponse.observe(ctx, {
                 Log.d(TAG, it.toString())
-                val options = it.examples.sortedBy { it.type }
+                val options = it.examples.sortedBy { example -> example.type }
                 val optionsAdapter = OptionsAdapter(ctx, R.layout.list_types_item, options)
                 (typeEditText.editText as AutoCompleteTextView).setAdapter(optionsAdapter)
             })
@@ -205,9 +203,8 @@ class SubmitActivity : BaseActivity(), View.OnClickListener {
         )
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onClick(v: View?) {
-        // Disable and upadte submit button
+        // Disable and update submit button
         disableSubmitButton()
         // Fetch user's current location
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -246,19 +243,17 @@ class SubmitActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun disableSubmitButton() {
         submitButton.isEnabled = false
         submitButton.isClickable = false
-        submitButton.background = resources.getDrawable(R.color.purple_200, theme)
+        submitButton.background = ResourcesCompat.getDrawable(resources, R.color.purple_200, theme)
         submitButton.text = resources.getString(R.string.submittingBtn)
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun enableSubmitButton() {
         submitButton.isEnabled = true
         submitButton.isClickable = true
-        submitButton.background = resources.getDrawable(R.color.purple_500, theme)
+        submitButton.background = ResourcesCompat.getDrawable(resources, R.color.purple_500, theme)
         submitButton.text = resources.getString(R.string.submitBtn)
     }
 
