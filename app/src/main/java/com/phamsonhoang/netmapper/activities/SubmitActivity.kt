@@ -203,12 +203,9 @@ class SubmitActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun getLocationForSubmission() {
-        if (ActivityCompat.checkSelfPermission(
+        if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             Log.d(TAG, "submit(): location permission denied")
@@ -251,11 +248,11 @@ class SubmitActivity : BaseActivity(), View.OnClickListener {
                     if ((ContextCompat.checkSelfPermission(this,
                             Manifest.permission.ACCESS_FINE_LOCATION) ==
                                 PackageManager.PERMISSION_GRANTED)) {
-                        Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Location permission granted", Toast.LENGTH_SHORT).show()
                         getLocationForSubmission()
                     }
                 } else {
-                    Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, resources.getString(R.string.locationPermissionRationale), Toast.LENGTH_LONG).show()
                     enableSubmitButton()
                 }
                 return
