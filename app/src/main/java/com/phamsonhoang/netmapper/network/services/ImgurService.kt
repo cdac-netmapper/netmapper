@@ -19,10 +19,11 @@ private const val IMGUR_CLIENT_ID = "c36a40d78cc19fc"
 interface ImgurService {
     @Multipart
     @Headers("Authorization: Client-ID $IMGUR_CLIENT_ID")
-    @POST("3/upload")
+    @POST("3/image")
     suspend fun uploadImage(
         @Part image: MultipartBody.Part?,
-        @Part("name") name: RequestBody? = null
+        @Part("name") name: RequestBody? = null,
+        @Part("title") title: RequestBody? = null
     ): Response<ImageUploadResponse>
 
     companion object {

@@ -123,8 +123,7 @@ class TagActivity : BaseActivity(), View.OnClickListener, View.OnTouchListener {
                 // Passing on file to SubmitActivity
                 val submitIntent = Intent(ctx, SubmitActivity::class.java)
                 submitIntent.putExtra("imageFile", taggedPhotoFile)
-                // Delete original temp photo file
-                deleteTempFile()
+                submitIntent.putExtra("originalImageFile", originalPhotoFile)
                 startActivity(submitIntent)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -184,9 +183,9 @@ class TagActivity : BaseActivity(), View.OnClickListener, View.OnTouchListener {
         }
     }
 
-    override fun onStop() {
+    override fun onBackPressed() {
         deleteTempFile()
-        super.onStop()
+        super.onBackPressed()
     }
 
     private fun deleteTempFile() {

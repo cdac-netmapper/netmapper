@@ -6,6 +6,8 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Submission(
+    @SerializedName("device")
+    val device: String,
     @SerializedName("type")
     val type: String,
     @SerializedName("desc")
@@ -14,6 +16,8 @@ data class Submission(
     val comment: String,
     @SerializedName("image")
     val image: String,
+    @SerializedName("originalImage")
+    val originalImage: String,
     @SerializedName("long")
     val long: Double,
     @SerializedName("lat")

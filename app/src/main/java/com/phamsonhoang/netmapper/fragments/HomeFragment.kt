@@ -71,7 +71,10 @@ class HomeFragment : Fragment() {
                             Log.d(TAG, "ORIENTATION_NORMAL")
                             isRotated = false
                         }
-                        else -> {}
+                        else -> {
+                            Log.d(TAG, "ORIENTATION_??? else")
+                            isRotated = false
+                        }
                     }
                     try {
                         if (isRotated) {

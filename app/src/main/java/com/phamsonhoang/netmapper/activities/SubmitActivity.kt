@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
+import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -37,12 +38,14 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.*
 
 private const val LOCATION_REQUEST_CODE = 1
 private const val TAG = "SubmitActivity"
 class SubmitActivity : BaseActivity(), View.OnClickListener {
     private lateinit var submitImageFile: File
+    private lateinit var submitOriginalImageFile: File
     private lateinit var locationCallback: LocationCallback
     // NetMapper API
     private lateinit var mainViewModel: MainViewModel
@@ -89,6 +92,8 @@ class SubmitActivity : BaseActivity(), View.OnClickListener {
         val submitImage = BitmapFactory.decodeFile(submitImageFile.absolutePath)
         Glide.with(this).load(submitImage).into(submitImageView)
 
+        submitOriginalImageFile = intent.extras?.get("originalImageFile") as File
+
         submitButton = findViewById(R.id.submitButton)
         submitButton.setOnClickListener(this)
 
@@ -119,45 +124,60 @@ class SubmitActivity : BaseActivity(), View.OnClickListener {
                 super.onLocationResult(result)
                 val location = result.lastLocation
                 Log.d(TAG, "Long: ${location.longitude}; Lat: ${location.latitude}")
-                // Upload image to Imgur & post submission
+                // Upload images to Imgur & post submission
                 uploadImage(location)
             }
         }
     }
 
-    override fun onStop() {
+    override fun onDestroy() {
         deleteTempFile()
-        super.onStop()
+        super.onDestroy()
+    }
+
+    private fun getAppInstallationID() : String {
+        val installationTime = packageManager.getPackageInfo(packageName, 0).firstInstallTime
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = installationTime
+        val dateFormatter = SimpleDateFormat("yyyymmdd-HHmmss")
+        return dateFormatter.format(calendar.time) + "nm"
     }
 
     private fun uploadImage(location: Location) {
-        val filePart = MultipartBody
+        val taggedFile = MultipartBody
             .Part
             .createFormData("image", submitImageFile.name, submitImageFile.asRequestBody())
+        val originalFile = MultipartBody
+            .Part
+            .createFormData("image", submitOriginalImageFile.name, submitOriginalImageFile.asRequestBody())
         with(imgurViewModel) {
-            imageUploadResponse.observe(ctx, {
+            imagesUploadResponse.observe(ctx, {
                 Log.d(TAG, it.toString())
-                // Post submission to server
-                postSubmission(it.upload.link, location)
+                Log.d(TAG, "Tagged photo upload response: ${it[0]}")
+                Log.d(TAG, "Original photo upload response: ${it[1]}")
+                postSubmission(it[0].upload.link, it[1].upload.link, location)
             })
+
             errorMessage.observe(ctx, {
                 Log.d(TAG, it.toString())
                 Toast.makeText(ctx, "Error: unable to upload image!", Toast.LENGTH_LONG).show()
             })
-            uploadImage(filePart)
-        }
 
+            upload2Images(taggedFile, originalFile)
+        }
     }
 
-    private fun postSubmission(imageLink: String, location: Location) {
+    private fun postSubmission(imageLink: String, ogImageLink: String, location: Location) {
         val df = DateFormat.getTimeInstance()
         df.timeZone = TimeZone.getTimeZone("gmt")
-
+        val deviceID = "nm-mngd-" + getAppInstallationID()
         val submission = Submission(
+            device = deviceID,
             type = typeEditText.editText?.text.toString(),
             desc = descEditText.editText?.text.toString(),
             comment = commentEditText.editText?.text.toString(),
             image = imageLink,
+            originalImage = ogImageLink,
             long = location.longitude,
             lat = location.latitude,
             submittedAt = df.format(Date())
@@ -259,5 +279,6 @@ class SubmitActivity : BaseActivity(), View.OnClickListener {
 
     private fun deleteTempFile() {
         Log.d(TAG, "deleted submit file: ${submitImageFile.delete()}")
+        Log.d(TAG, "deleted original submit file: ${submitOriginalImageFile.delete()}")
     }
 }

@@ -6,12 +6,11 @@ import com.phamsonhoang.netmapper.models.responses.ImageUploadResponse
 import com.phamsonhoang.netmapper.network.repositories.ImgurRepository
 import kotlinx.coroutines.*
 import okhttp3.MultipartBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import java.lang.Exception
 
 class ImgurViewModel constructor(private val repository: ImgurRepository) : ViewModel() {
     val imageUploadResponse = MutableLiveData<ImageUploadResponse>()
+    val imagesUploadResponse = MutableLiveData<List<ImageUploadResponse>>()
     val errorMessage = MutableLiveData<String>()
     val loading = MutableLiveData<Boolean>()
 
@@ -31,6 +30,20 @@ class ImgurViewModel constructor(private val repository: ImgurRepository) : View
                 } else {
                     onError("Error: ${response.message()}")
                 }
+            }
+        }
+    }
+
+    fun upload2Images(image1: MultipartBody.Part, image2: MultipartBody.Part) {
+        loading.postValue(true)
+        job = CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val task1 = async { repository.uploadImage(image1) }
+                val task2 = async { repository.uploadImage(image2) }
+                val data = listOf(task1.await().body()!!, task2.await().body()!!)
+                imagesUploadResponse.postValue(data)
+            } catch (e: Exception) {
+                onError("Error: ${e.message}")
             }
         }
     }
