@@ -71,6 +71,9 @@ class TagActivity : BaseActivity(), View.OnClickListener, View.OnTouchListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tag)
 
+        // Initial instruction toast dialog
+        Toast.makeText(this, resources.getString(R.string.tagInstruction), Toast.LENGTH_LONG).show()
+
         paintDraw = Paint()
         paintDraw.style = Paint.Style.STROKE
         paintDraw.color = Color.RED

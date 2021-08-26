@@ -19,4 +19,5 @@
     <string name="cancel">Cancel</string>
     <string name="undo">Undo</string>
     <string name="locationPermissionRationale">NetMapper needs access to location services to map network infrastructures. You will not be associated with the location data by any means!</string>
+    <string name="tagInstruction">Circles/boxes the network infrastructure in the picture with your finger!</string>
 </resources>

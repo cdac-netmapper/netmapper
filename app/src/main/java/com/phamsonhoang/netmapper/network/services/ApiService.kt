@@ -10,7 +10,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 
-private const val BASE_API_URL = "https://af65-14-161-34-47.ngrok.io/"
+private const val BASE_API_URL = "https://ff7d-14-161-34-47.ngrok.io/"
 
 interface ApiService {
     @POST("submit")
